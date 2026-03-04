@@ -3,16 +3,61 @@
 import { CityCard } from '@/components/dashboard/city-card'
 import { useNocStore } from '@/lib/store'
 import { MapPin, TrendingUp } from 'lucide-react'
+import type { CityOverviewResponse } from '@/lib/types/city'
+import { useState, useEffect } from 'react'
+import { apiGet } from '@/lib/api/client'
 
 export default function CitiesPage() {
-  const cities = useNocStore((state) => state.cities)
+  const [data, setData] = useState<CityOverviewResponse | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  // Calculate overall stats
-  const totalOnt = cities.reduce((sum, city) => sum + city.totalOnt, 0)
-  const totalOnline = cities.reduce((sum, city) => sum + city.ontOnline, 0)
-  const totalOffline = cities.reduce((sum, city) => sum + city.ontOffline, 0)
-  const avgHealthScore = (cities.reduce((sum, city) => sum + city.networkHealthScore, 0) / cities.length).toFixed(1)
-  const totalTickets = cities.reduce((sum, city) => sum + city.ticketsInProgress.incident + city.ticketsInProgress.complain, 0)
+  // Create function to fetch city overview data from the API
+  const fetchCityOverview = async () => {
+    try {
+      setError(null)
+      const response = await apiGet<CityOverviewResponse>("/cities")
+      setData(response)
+    } catch (e: any) {
+      setError(e?.message ?? "Failed to load data from server")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Fetch city overview data on component mount
+  useEffect(() => {
+    fetchCityOverview()
+    const id = setInterval(fetchCityOverview, 60 * 1000) // Refresh every 5 minutes
+    return () => clearInterval(id)
+  }, [])
+
+  // Handle loading and error states
+  if (loading && !data) return <div className='p-5'>Loading...</div>
+
+  // Handle error
+  if(error && !data) {
+    return (
+      <div className='p-6'>
+        <div className='rounded-md border border-border p-4'>
+          <div className='text-red-500'>Data temporarily not available</div>
+          <div className='font-semibold'>{error}</div>
+        </div>
+      </div>
+    )
+  }
+
+  // Extract overview data
+  const overview = data?.overview
+  const totalOnt = overview?.total_ont ?? 0
+  const totalOnline = overview?.online_ont ?? 0
+  const totalOffline = overview?.offline_ont ?? 0
+  const avgHealthScore = overview?.avg_health_score_pct ?? 0
+  const totalTickets = overview?.active_tt_total ?? 0
+
+  // Calculate percentages with safe division
+  const onlinePct = totalOnt > 0 ? ((totalOnline / totalOnt) * 100).toFixed(1) : "0.0"
+  const offlinePct = totalOnt> 0 ? ((totalOffline / totalOnt) * 100).toFixed(1) : "0.0"
 
   return (
     <div className="space-y-6">
@@ -29,17 +74,17 @@ export default function CitiesPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <div className="bg-card border border-border rounded-lg p-4">
           <p className="text-sm text-muted-foreground mb-2">Total ONT</p>
-          <p className="text-3xl font-bold text-foreground">{totalOnt}</p>
+          <p className="text-3xl font-bold text-foreground">{totalOnt.toLocaleString()}</p>
         </div>
         <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
           <p className="text-sm text-green-400 mb-2">Online ONT</p>
-          <p className="text-3xl font-bold text-green-400">{totalOnline}</p>
-          <p className="text-xs text-green-400 mt-1">{((totalOnline / totalOnt) * 100).toFixed(1)}%</p>
+          <p className="text-3xl font-bold text-green-400">{totalOnline.toLocaleString()}</p>
+          <p className="text-xs text-green-400 mt-1">{onlinePct}%</p>
         </div>
         <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
           <p className="text-sm text-red-400 mb-2">Offline ONT</p>
           <p className="text-3xl font-bold text-red-400">{totalOffline}</p>
-          <p className="text-xs text-red-400 mt-1">{((totalOffline / totalOnt) * 100).toFixed(1)}%</p>
+          <p className="text-xs text-red-400 mt-1">{offlinePct}%</p>
         </div>
         <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
           <p className="text-sm text-primary mb-2 flex items-center gap-1">
@@ -61,9 +106,11 @@ export default function CitiesPage() {
           Cities & Regions
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {cities.map((city) => (
-            <CityCard key={city.id} city={city} />
-          ))}
+          {data?.cities.map((city) => {
+            return (
+              <CityCard key={city.city} city={city}/>
+            )
+          })}
         </div>
       </div>
     </div>
