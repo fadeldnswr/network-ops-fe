@@ -23,56 +23,56 @@ import { Button } from '@/components/ui/button'
 import React, { useState } from 'react'
 
 const navItems = [
-  {
-    title: 'Dashboard',
-    href: '/dashboard',
-    icon: BarChart3,
-  },
+  // {
+  //   title: 'Dashboard',
+  //   href: '/dashboard',
+  //   icon: BarChart3,
+  // },
   {
     title: 'Network Monitoring',
     href: '/dashboard/network',
     icon: Network,
   },
+  // {
+  //   title: 'Device Management',
+  //   href: '/dashboard/devices',
+  //   icon: HardDrive,
+  // },
+  // {
+  //   title: 'Incident Monitoring',
+  //   href: '/dashboard/incidents',
+  //   icon: AlertTriangle,
+  // },
   {
-    title: 'Device Management',
-    href: '/dashboard/devices',
-    icon: HardDrive,
-  },
-  {
-    title: 'Incident Monitoring',
-    href: '/dashboard/incidents',
-    icon: AlertTriangle,
-  },
-  {
-    title: 'Performance Analytics',
-    href: '/dashboard/analytics',
+    title: 'Device Summary',
+    href: '/dashboard/summary',
     icon: TrendingUp,
   },
   {
-    title: 'City Overview',
+    title: 'ONT Overview',
     href: '/dashboard/cities',
     icon: MapPin,
   },
   {
-    title: 'Customer Impact',
+    title: 'Network Topology',
     href: '/dashboard/customers',
     icon: Users2,
   },
-  {
-    title: 'Reports',
-    href: '/dashboard/reports',
-    icon: FileText,
-  },
-  {
-    title: 'User Management',
-    href: '/dashboard/users',
-    icon: Users,
-  },
-  {
-    title: 'Settings',
-    href: '/dashboard/settings',
-    icon: Settings,
-  },
+  // {
+  //   title: 'Reports',
+  //   href: '/dashboard/reports',
+  //   icon: FileText,
+  // },
+  // {
+  //   title: 'User Management',
+  //   href: '/dashboard/users',
+  //   icon: Users,
+  // },
+  // {
+  //   title: 'Settings',
+  //   href: '/dashboard/settings',
+  //   icon: Settings,
+  // },
 ]
 
 export function Sidebar({ collapsed, setCollapsed }: { collapsed: boolean; setCollapsed: React.Dispatch<React.SetStateAction<boolean>> }) {

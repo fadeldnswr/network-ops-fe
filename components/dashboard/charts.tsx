@@ -31,7 +31,12 @@ interface LineChartProps {
   lines: Array<{ key: string; stroke: string }>
 }
 
-export function LineChartComponent({ title, description, data, lines }: LineChartProps) {
+export function LineChartComponent({
+  title,
+  description,
+  data,
+  lines,
+}: LineChartProps) {
   return (
     <Card className="bg-card border-border/50">
       <CardHeader>
@@ -42,8 +47,18 @@ export function LineChartComponent({ title, description, data, lines }: LineChar
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-            <XAxis dataKey="name" stroke="var(--color-muted-foreground)" />
-            <YAxis stroke="var(--color-muted-foreground)" />
+            <XAxis
+              dataKey="name"
+              stroke="var(--color-muted-foreground)"
+              angle={-45}  // Rotasi untuk label waktu agar lebih mudah terbaca
+              textAnchor="end"  // Posisi teks yang lebih baik
+              tick={{ fontSize: 12 }} // Ukuran font untuk tick
+              tickFormatter={(tick) => new Date(tick).toLocaleTimeString()} // Memformat waktu
+            />
+            <YAxis
+              stroke="var(--color-muted-foreground)"
+              tickFormatter={(tick) => (tick / 1e9).toFixed(2)} // Menampilkan dalam Gbps
+            />
             <Tooltip
               contentStyle={{
                 backgroundColor: 'var(--color-card)',

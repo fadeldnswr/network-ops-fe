@@ -29,7 +29,7 @@ export function CityCard({ city }: CityCardProps) {
 
   // Severity color based on AI recommendation severity level
   const severityClass =
-    city.ai_severity === 'CRITICAL'
+    city.ai_severity === 'CRIT'
       ? 'text-red-400'
       : city.ai_severity === 'WARN'
       ? 'text-amber-400'
