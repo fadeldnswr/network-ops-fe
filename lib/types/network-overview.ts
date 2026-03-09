@@ -23,3 +23,13 @@ export type NetworkGraphResponse = {
 export type NetworkGraphListResponse = {
     data: NetworkGraphResponse[]
 }
+
+// Define network device overview
+export type DeviceOverviewResponse = {
+    total_router: number
+    active_router: number
+    inactive_router: number
+    total_olt: number
+    active_olt: number
+    inactive_olt: number
+}

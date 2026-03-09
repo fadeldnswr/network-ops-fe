@@ -1,5 +1,5 @@
 import type { CityOverviewResponse } from "../types/city";
-import { NetworkGraphListResponse, NetworkOverviewResponse } from "../types/network-overview";
+import { DeviceOverviewResponse, NetworkGraphListResponse, NetworkOverviewResponse } from "../types/network-overview";
 import { apiGet } from "./client";
 
 // Define API endpoints for fetching city overview data
@@ -10,3 +10,6 @@ export const getNetworkOverview = () => apiGet<NetworkOverviewResponse>("/networ
 
 // Define API endpoints for fetching network graph data (time series)
 export const getNetworkGraphData = () => apiGet<NetworkGraphListResponse>("/network-overview/graph/")
+
+// Define API endpoints for fetching device overview data
+export const getDeviceOverview = () => apiGet<DeviceOverviewResponse>("/devices/")
