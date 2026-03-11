@@ -1,7 +1,6 @@
 'use client'
 
 import { CityCard } from '@/components/dashboard/city-card'
-import { useNocStore } from '@/lib/store'
 import { MapPin, TrendingUp } from 'lucide-react'
 import type { CityOverviewResponse } from '@/lib/types/city'
 import { useState, useEffect } from 'react'
@@ -65,9 +64,9 @@ export default function CitiesPage() {
       <div>
         <div className="flex items-center gap-2 mb-2">
           <MapPin className="w-6 h-6 text-primary" />
-          <h1 className="text-3xl font-bold text-foreground">City Overview</h1>
+          <h1 className="text-3xl font-bold text-foreground">Router Overview</h1>
         </div>
-        <p className="text-muted-foreground">Monitor network performance across all service regions</p>
+        <p className="text-muted-foreground">Monitor router network performance and health score across all service regions</p>
       </div>
 
       {/* Summary Statistics */}
@@ -83,7 +82,7 @@ export default function CitiesPage() {
         </div>
         <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
           <p className="text-sm text-red-400 mb-2">Offline ONT</p>
-          <p className="text-3xl font-bold text-red-400">{totalOffline}</p>
+          <p className="text-3xl font-bold text-red-400">{totalOffline.toLocaleString()}</p>
           <p className="text-xs text-red-400 mt-1">{offlinePct}%</p>
         </div>
         <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
