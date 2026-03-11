@@ -1,4 +1,5 @@
 import type { CityOverviewResponse } from "../types/city";
+import { LinkConnection } from "../types/link-connection";
 import { DeviceOverviewResponse, NetworkGraphListResponse, NetworkOverviewResponse } from "../types/network-overview";
 import { apiGet } from "./client";
 
@@ -13,3 +14,6 @@ export const getNetworkGraphData = () => apiGet<NetworkGraphListResponse>("/netw
 
 // Define API endpoints for fetching device overview data
 export const getDeviceOverview = () => apiGet<DeviceOverviewResponse>("/devices/")
+
+// Define API endpoints for fetching link connection data
+export const getLinkConnectionOverview = () => apiGet<LinkConnection>("/link-connection/")
