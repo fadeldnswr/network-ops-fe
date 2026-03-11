@@ -3,7 +3,7 @@
 export type DeviceCardProps = {
     title: string
     value: number | string
-    percent?: number | 0.0
+    percent?: number | string
     variant?: 'default' | 'success' | 'danger'
 }
 
