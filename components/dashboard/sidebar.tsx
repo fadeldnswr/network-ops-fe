@@ -3,47 +3,19 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-  BarChart3,
-  Users,
-  Settings,
-  Radio,
-  AlertTriangle,
-  TrendingUp,
-  Users2,
-  FileText,
-  HardDrive,
-  Network,
-  Menu,
-  X,
-  MapPin,
-  ChevronRight,
-  ChevronLeft,
-  Router
+  Radio, Users2, HardDrive, Network,
+  Menu, X, ChevronRight, ChevronLeft, Router 
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import React, { useState } from 'react'
 
+// Create navigation items for sidebar navigation
 const navItems = [
-  // {
-  //   title: 'Dashboard',
-  //   href: '/dashboard',
-  //   icon: BarChart3,
-  // },
   {
     title: 'Network Monitoring',
     href: '/dashboard/network',
     icon: Network,
   },
-  // {
-  //   title: 'Device Management',
-  //   href: '/dashboard/devices',
-  //   icon: HardDrive,
-  // },
-  // {
-  //   title: 'Incident Monitoring',
-  //   href: '/dashboard/incidents',
-  //   icon: AlertTriangle,
-  // },
   {
     title: 'Device Summary',
     href: '/dashboard/summary',
@@ -59,21 +31,6 @@ const navItems = [
     href: '/dashboard/rsl',
     icon: Users2,
   },
-  // {
-  //   title: 'Reports',
-  //   href: '/dashboard/reports',
-  //   icon: FileText,
-  // },
-  // {
-  //   title: 'User Management',
-  //   href: '/dashboard/users',
-  //   icon: Users,
-  // },
-  // {
-  //   title: 'Settings',
-  //   href: '/dashboard/settings',
-  //   icon: Settings,
-  // },
 ]
 
 export function Sidebar({ collapsed, setCollapsed }: { collapsed: boolean; setCollapsed: React.Dispatch<React.SetStateAction<boolean>> }) {
