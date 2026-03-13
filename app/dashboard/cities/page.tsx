@@ -64,7 +64,7 @@ export default function CitiesPage() {
       <div>
         <div className="flex items-center gap-2 mb-2">
           <MapPin className="w-6 h-6 text-primary" />
-          <h1 className="text-3xl font-bold text-foreground">Router Overview</h1>
+          <h1 className="text-3xl font-bold text-foreground">ONT Overview</h1>
         </div>
         <p className="text-muted-foreground">Monitor router network performance and health score across all service regions</p>
       </div>
@@ -100,10 +100,11 @@ export default function CitiesPage() {
 
       {/* Cities Grid - Smaller Cards */}
       <div>
-        <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+        <div className="flex items-center gap-2 mb-2">
           <MapPin className="w-5 h-5" />
-          Cities & Regions
-        </h2>
+          <h3 className="text-2xl font-bold text-foreground">Cities & Regions</h3>
+        </div>
+        <p className="text-muted-foreground pb-6">View detailed information about each city and region</p>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {data?.cities.map((city) => {
             return (
