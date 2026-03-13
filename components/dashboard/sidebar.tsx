@@ -17,7 +17,8 @@ import {
   X,
   MapPin,
   ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  Router
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import React, { useState } from 'react'
@@ -46,16 +47,16 @@ const navItems = [
   {
     title: 'Device Summary',
     href: '/dashboard/summary',
-    icon: TrendingUp,
+    icon: HardDrive,
   },
   {
     title: 'ONT Overview',
     href: '/dashboard/cities',
-    icon: MapPin,
+    icon: Router,
   },
   {
-    title: 'Network Topology',
-    href: '/dashboard/customers',
+    title: 'RSL Overview',
+    href: '/dashboard/rsl',
     icon: Users2,
   },
   // {
