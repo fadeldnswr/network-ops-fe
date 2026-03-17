@@ -7,7 +7,10 @@ import { RSLOutputResponse, RSLOutputRow, RSLStatus } from '@/lib/types/olt-rsl'
 import { useEffect, useState } from 'react'
 import { apiGet } from '@/lib/api/client'
 
+const statusOption: RSLStatus[] = ["GOOD", "WARN", "CRIT"]
+
 export default function RSL() {
+  const [query, setQuery]= useState<RSLStatus>("WARN")
   const [rslData, setRslData] = useState<RSLOutputRow[]>([])
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
@@ -21,13 +24,15 @@ export default function RSL() {
   }
 
   // Define function to fetch RSL overview data from API
-  const fetchRSLOverview = async () => {
+  const fetchRSLOverview = async (status: RSLStatus) => {
     try {
       setError(null)
       setLoading(true)
 
       // Fetch data from API
-      const response = await apiGet<RSLOutputResponse>("/olt-table/")
+      const response = await apiGet<RSLOutputResponse>(
+        `/olt-table/?query_status=${encodeURIComponent(status)}`
+      )
       const rows = Array.isArray(response.data) ? response.data : []
 
       // Map each value to rows
@@ -58,12 +63,12 @@ export default function RSL() {
 
   // Fetch RSL overview data on component mount
   useEffect(() => {
-    fetchRSLOverview()
+    fetchRSLOverview(query)
 
     const id = setInterval(() => {
-      fetchRSLOverview()
+      fetchRSLOverview(query)
     }, 5 * 60 * 1000)
-  }, [])
+  }, [query])
 
   return (
     <div className="space-y-6">
@@ -76,6 +81,31 @@ export default function RSL() {
           <p className="text-muted-foreground">
             View OLT PON port status based on current RSL percentage threshold
           </p>
+        </div>
+
+        {/* Query Button */}
+        <div className='flex flex-wrap gap-2'>
+          {statusOption.map((status) => {
+            const isActive = query === status
+            return (
+              <button
+                key={status}
+                className={[
+                  'rounded-md px-4 py-2 text-sm font-medium transition',
+                  isActive
+                    ? status === 'CRIT'
+                      ? 'bg-red-500/15 text-red-400'
+                      : status === 'WARN'
+                      ? 'bg-amber-500/15 text-amber-400'
+                      : 'bg-emerald-500/15 text-emerald-400'
+                    : 'text-muted-foreground hover:bg-secondary/40 hover:text-foreground',
+                ].join(' ')}
+                onClick={() => setQuery(status)}
+              >
+                {status}
+              </button>
+            )
+          })}
         </div>
 
         {error ? (
