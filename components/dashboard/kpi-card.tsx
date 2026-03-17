@@ -32,7 +32,7 @@ export function KPICard({
             <p className="mt-2 text-2xl font-bold text-foreground">{value}</p>
             {subtext && <p className="mt-1 text-xs text-muted-foreground">{subtext}</p>}
           </div>
-          {icon && <div className="ml-4 flex-shrink-0 text-accent">{icon}</div>}
+          {icon && <div className="ml-4 shrink-0 text-accent">{icon}</div>}
         </div>
         {trend && (
           <div className="mt-4 flex items-center gap-1">
