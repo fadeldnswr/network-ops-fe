@@ -5,28 +5,32 @@ export type DeviceCardProps = {
     value: number | string
     percent?: number | string
     variant?: 'default' | 'success' | 'danger'
+    icon?: React.ReactNode
 }
 
-export function DeviceCard({ title, value, percent, variant = "default"}: DeviceCardProps) {
+export function DeviceCard({ title, value, percent, variant = "default", icon}: DeviceCardProps) {
     // Create styles for different variants
     const styles = {
         default: {
-        container: "bg-card border border-border",
-        text: "text-muted-foreground",
-        value: "text-foreground",
-        percent: "text-muted-foreground",
+            container: "bg-card border border-border",
+            text: "text-muted-foreground",
+            value: "text-foreground",
+            percent: "text-muted-foreground",
+            iconWrap: "bg-secondary/40 text-muted-foreground",
         },
         success: {
-        container: "bg-green-500/10 border border-green-500/20",
-        text: "text-green-400",
-        value: "text-green-400",
-        percent: "text-green-400",
+            container: "bg-green-500/10 border border-green-500/20",
+            text: "text-green-400",
+            value: "text-green-400",
+            percent: "text-green-400",
+            iconWrap: "bg-green-500/20 text-green-400",
         },
         danger: {
-        container: "bg-red-500/10 border border-red-500/20",
-        text: "text-red-400",
-        value: "text-red-400",
-        percent: "text-red-400",
+            container: "bg-red-500/10 border border-red-500/20",
+            text: "text-red-400",
+            value: "text-red-400",
+            percent: "text-red-400",
+            iconWrap: "bg-red-500/20 text-red-400",
         },
     }
 
@@ -35,13 +39,26 @@ export function DeviceCard({ title, value, percent, variant = "default"}: Device
 
     return (
         <div className={`${style.container} rounded-lg p-4`}>
-            <p className={`${style.text} text-sm mb-2`}>{title}</p>
+            {/* Header */}
+            <div className="flex items-center gap-3 mb-3">
+                {icon && (
+                <div className={`flex items-center justify-center rounded-xl ${style.iconWrap}`}>
+                    {icon}
+                </div>
+                )}
+
+                <p className={`${style.text} text-sm`}>
+                {title}
+                </p>
+            </div>
+            {/* Value */}
             <p className={`text-3xl font-bold ${style.value}`}>
-                {value.toLocaleString()}
+                {typeof value === "number" ? value.toLocaleString() : value}
             </p>
+            {/* Percent */}
             {percent !== undefined && (
                 <p className={`text-xs ${style.percent} mt-1`}>
-                    {percent}%
+                {percent}%
                 </p>
             )}
         </div>
