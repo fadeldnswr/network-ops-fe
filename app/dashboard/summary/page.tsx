@@ -1,6 +1,6 @@
 'use client'
 
-import { CircleAlert, Link, MapPin } from 'lucide-react'
+import { Cable, CircleAlert, Link, MapPin, Network, WifiOff, Activity, HardDrive, Server, User } from 'lucide-react'
 import type { CityOverviewResponse } from '@/lib/types/city'
 import { useState, useEffect } from 'react'
 import { apiGet } from '@/lib/api/client'
@@ -8,16 +8,113 @@ import { DeviceOverviewResponse } from '@/lib/types/network-overview'
 import { DeviceCard, DeviceCardProps } from '@/components/dashboard/device-card'
 import { AlertSummaryCard } from '@/components/dashboard/alert-summary-card'
 import { LinkConnection } from '@/lib/types/link-connection'
+import { AlertTable, SeverityBadge, type AlertColumn } from '@/components/dashboard/alert-table'
+import { AlertApiResponse, AlertTableRow } from '@/lib/types/alert-table'
+
+// Define columns for alert table
+const alertColumns: AlertColumn<AlertTableRow>[] = [
+  {
+    key: 'timestamp',
+    header: 'Timestamp',
+    className: 'whitespace-nowrap text-muted-foreground',
+  },
+  {
+    key: 'site',
+    header: 'Site',
+    className: 'whitespace-nowrap',
+  },
+  {
+    key: 'device',
+    header: 'Device',
+    className: 'whitespace-nowrap font-medium',
+  },
+  {
+    key: 'port',
+    header: 'Port',
+    className: 'whitespace-nowrap',
+  },
+  {
+    key: 'alert_type',
+    header: 'Alert Type',
+    className: 'whitespace-nowrap',
+  },
+  {
+    key: 'severity',
+    header: 'Severity',
+    render: (row) => <SeverityBadge severity={row.severity} />,
+  },
+  {
+    key: 'status',
+    header: 'Status',
+    className: 'whitespace-nowrap',
+  },
+  {
+    key: 'description',
+    header: 'Description',
+    className: 'min-w-[280px] text-muted-foreground',
+  },
+]
 
 export default function CitiesPage() {
   // Define state for data fetch
   const [ont, setOnt] = useState<CityOverviewResponse | null>(null)
   const [data, setData] = useState<DeviceOverviewResponse | null>(null)
   const [linkConnection, setLinkConnection] = useState<LinkConnection | null>(null)
+  const [alertTable, setAlertTable] = useState<AlertTableRow[]>([])
 
   // Define state for loading and error handling
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  // Define function to normalize severity
+  const normalizeSeverity = (value: string): "critical" | "warning" | "info" | "normal" => {
+    const severity = value.toLowerCase()
+    if(severity === "critical") return "critical"
+    if(severity === "warning") return "warning"
+    if(severity === "info") return "info"
+    return "normal" 
+  } 
+
+  // Create functiont to fetch alert table data from the API
+  const fetchAlertTable = async () => {
+    try {
+      setError(null)
+      
+      // Fetch alert table data from the API and log the raw response for debugging
+      const response = await apiGet<AlertApiResponse>("/alert-table/")
+      console.log("raw response: ", response)
+      console.log("is array: ", Array.isArray(response))
+      console.log("data field: ", (response as any).data)
+
+      // Map API response to alert table rows and log the mapped result for debugging
+      const mapped: AlertTableRow[] = response.data.map((item, index) => ({
+        id: `${item.device}-${item.timestamp}-${index}`,
+        timestamp: new Date(item.timestamp).toLocaleString('en-GB', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        }),
+        site: item.site,
+        device: item.device,
+        port: item.port,
+        alert_type: item.alert_type,
+        severity: normalizeSeverity(item.severity),
+        status: item.status,
+        description: item.description,
+      }))
+      setAlertTable(mapped)
+      console.log("mapped alert table:", mapped)
+      console.log("mapped length:", mapped.length)
+    } catch (e: any) {
+      console.error("Fetch table error", e)
+      setError(e?.message ?? "Failed to load alert data from server")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Create function to fetch city overview data from the API
   const fetchCityOverview = async () => {
@@ -64,12 +161,14 @@ export default function CitiesPage() {
     fetchCityOverview()
     fetchDeviceOverview()
     fetchLinkConnectionOverview()
+    fetchAlertTable()
 
     // Set up interval to refresh data every 1 minute
     const id = setInterval(() => {
       fetchCityOverview()
       fetchDeviceOverview()
       fetchLinkConnectionOverview()
+      fetchAlertTable()
     }, 60 * 1000) // Refresh every 1 minute
     return () => clearInterval(id)
   }, [])
@@ -128,93 +227,127 @@ export default function CitiesPage() {
 
   // Define router stats
   const routerStats: DeviceCardProps[] = [
-    { title: "Total Router", value: totalRouter },
-    { title: "Online Router", value: activeRouter, percent: onlineRouterPct, variant: "success" },
-    { title: "Offline Router", value: inactiveRouter, percent: offlineRouterPct, variant: "danger" },
+    { title: "Total Router", value: totalRouter, icon: <HardDrive className="h-5 w-5" /> },
+    { title: "Online Router", value: activeRouter, percent: onlineRouterPct, variant: "success", icon: <HardDrive className="h-5 w-5" /> },
+    { title: "Offline Router", value: inactiveRouter, percent: offlineRouterPct, variant: "danger", icon: <HardDrive className="h-5 w-5" /> },
   ]
 
   // Define OLT stats
   const oltStats: DeviceCardProps[] = [
-    { title: "Total OLT", value: totalOlt },
-    { title: "Online OLT", value: activeOlt, percent: onlineOltPct, variant: "success" },
-    { title: "Offline OLT", value: inactiveOlt, percent: offlineOltPct, variant: "danger" },
+    { title: "Total OLT", value: totalOlt, icon: <Server className="h-5 w-5" /> },
+    { title: "Online OLT", value: activeOlt, percent: onlineOltPct, variant: "success", icon: <Server className="h-5 w-5" /> },
+    { title: "Offline OLT", value: inactiveOlt, percent: offlineOltPct, variant: "danger", icon: <Server className="h-5 w-5" /> },
   ]
 
   // Define ONT stats
   const ontStats: DeviceCardProps[] = [
-    { title: "Total ONT", value: totalOnt },
-    { title: "Online ONT", value: totalOnline, percent: onlinePct, variant: "success" },
-    { title: "Offline ONT", value: totalOffline, percent: offlinePct, variant: "danger" },
+    { title: "Total ONT", value: totalOnt, icon: <User className='h-5 w-5' /> },
+    { title: "Online ONT", value: totalOnline, percent: onlinePct, variant: "success", icon: <User className='h-5 w-5' /> },
+    { title: "Offline ONT", value: totalOffline, percent: offlinePct, variant: "danger", icon: <User className='h-5 w-5' /> },
   ]
 
   // Define link connection stats
   const alertCards = [
-    { title: "Link Backhaul Down", key: "link_backhaul_down" },
-    { title: "PON Loss OLT Down", key: "pon_loss_olt_down" },
-    { title: "Uplink OLT Down", key: "uplink_olt_down" },
-    { title: "LACP OLT Down", key: "lacp_olt_down" },
+    {
+      title: "Link Backhaul Down",
+      key: "link_backhaul_down",
+      icon: <Network className="h-6 w-6" />,
+    },
+    {
+      title: "OLT PON Loss",
+      key: "pon_loss_olt_down",
+      icon: <WifiOff className="h-6 w-6" />,
+    },
+    {
+      title: "Uplink OLT Down",
+      key: "uplink_olt_down",
+      icon: <Cable className="h-6 w-6" />,
+    },
+    {
+      title: "Last 24H Congest",
+      key: "lacp_olt_down",
+      icon: <Activity className="h-6 w-6" />,
+    },
   ]
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div>
-        <div className="flex items-center gap-2 mb-2">
-          <MapPin className="w-6 h-6 text-primary" />
-          <h1 className="text-3xl font-bold text-foreground">Device Overview</h1>
-        </div>
-        <p className="text-muted-foreground">Monitor network performance across all service regions</p>
-      </div>
+      {/* Top Section: Device Overview + Link Connection side by side */}
+      <div className="grid grid-cols-1 lg:grid-cols-[2fr_1.2fr] gap-6 items-start">
+        
+        {/* Device Overview */}
+        <section className="space-y-4 min-w-0">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <MapPin className="w-6 h-6 text-primary" />
+              <h1 className="text-3xl font-bold text-foreground">Device Overview</h1>
+            </div>
+            <p className="text-muted-foreground">
+              Monitor network performance across all service regions
+            </p>
+          </div>
 
-      {/* Summary Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Router Statistics */}
-        {routerStats.map((stat, key) => (
-          <DeviceCard key={key} {...stat} />
-        ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {/* Router Statistics */}
+            {routerStats.map((stat, key) => (
+              <DeviceCard key={`router-${key}`} {...stat} />
+            ))}
 
-        {/* OLT Statistics */}
-        {oltStats.map((stat, key) => (
-          <DeviceCard key={key} {...stat} />
-        ))}
+            {/* OLT Statistics */}
+            {oltStats.map((stat, key) => (
+              <DeviceCard key={`olt-${key}`} {...stat} />
+            ))}
 
-        {/* ONT Statistics */}
-        {ontStats.map((stat, key) => (
-          <DeviceCard key={key} {...stat} />
-        ))}
+            {/* ONT Statistics */}
+            {ontStats.map((stat, key) => (
+              <DeviceCard key={`ont-${key}`} {...stat} />
+            ))}
+          </div>
+        </section>
 
-      </div>
-
-      {/* Link Connnection */}
-      <div>
-        <div className="flex items-center gap-2 mb-2">
-          <Link className="w-6 h-6 text-primary" />
-          <h1 className='text-2xl font-semibold text-foreground'>Link Connection</h1>
-        </div>
-        <p className="text-muted-foreground">Monitor link connection across multiple sites</p>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {alertCards.map((card) => {
-          const value = linkConnection ? linkConnection[card.key as keyof LinkConnection] : 0
-          return (
-            <AlertSummaryCard
-              key={card.key}
-              title={card.title}
-              value={value}
-              variant={getAlertVariant(value)}
-            />
-          )
-        })}
+        {/* Link Connection */}
+        <section className="space-y-4 min-w-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-4 auto-rows-fr mt-21">
+            {alertCards.map((card) => {
+              const value = linkConnection
+                ? linkConnection[card.key as keyof LinkConnection]
+                : 0
+              return (
+                <AlertSummaryCard
+                  key={card.key}
+                  title={card.title}
+                  value={value}
+                  variant={getAlertVariant(value)}
+                  className="h-full"
+                  icon={card.icon}
+                />
+              )
+            })}
+          </div>
+        </section>
       </div>
 
       {/* Alert Table */}
-      <div>
-        <div className="flex items-center gap-2 mb-2">
-          <CircleAlert className="w-6 h-6 text-primary" />
-          <h1 className='text-2xl font-semibold text-foreground'>Alert Table</h1>
+      <section className="space-y-4">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <CircleAlert className="w-6 h-6 text-primary" />
+            <h1 className="text-2xl font-semibold text-foreground">Alert Table</h1>
+          </div>
+          <p className="text-muted-foreground">
+            View detailed alert information across all sites
+          </p>
         </div>
-        <p className="text-muted-foreground">View detailed alert information across all sites</p>
-      </div>
+
+        <AlertTable
+          title="Active Alerts"
+          description="Current alarm and incident list across monitored devices"
+          columns={alertColumns}
+          data={alertTable}
+          emptyMessage="No active alerts at the moment."
+          pageSize={5}
+        />
+      </section>
     </div>
   )
 }
