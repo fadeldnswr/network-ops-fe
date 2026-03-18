@@ -32,7 +32,6 @@ cd network-ops-fe
 npm install
 ```
 3. Configure environment variables:
-Create a `.env.local` file in the root directory and add your API endpoints:
 ```
 NEXT_PUBLIC_API_URL=https://your-network-api.com
 ```
