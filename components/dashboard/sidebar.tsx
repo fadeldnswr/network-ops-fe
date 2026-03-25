@@ -33,6 +33,7 @@ const navItems = [
   },
 ]
 
+// Sidebar component with responsive design and collapsible functionality
 export function Sidebar({ collapsed, setCollapsed }: { collapsed: boolean; setCollapsed: React.Dispatch<React.SetStateAction<boolean>> }) {
   const [open, setOpen] = useState<boolean>(true)
   const pathname = usePathname()
@@ -74,7 +75,8 @@ export function Sidebar({ collapsed, setCollapsed }: { collapsed: boolean; setCo
             </Button>
           </div>
         </div>
-
+        
+        {/* Navigation */}
         <nav className="space-y-2 p-4">
           {navItems.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
