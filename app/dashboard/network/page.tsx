@@ -43,10 +43,10 @@ export default function NetworkMonitoringPage() {
     return () => clearInterval(id)
   }, [])
 
-  // Handle loading
+  // Handle loading for network overview data
   if(loading && !data) return <div className='p-6'>Loading...</div> 
 
-  // Handle error
+  // Handle error for network overview data
   if(error && !data){
     return (
       <div className='p-6'>
@@ -59,7 +59,7 @@ export default function NetworkMonitoringPage() {
   }
 
   // Destructure values from data
-  const { total_bandwidth, current_usage, usage_percent, in_bps, out_bps, in_gb, out_gb } = data!
+  const { total_bandwidth, current_usage, usage_percent, in_bps, out_bps } = data!
 
   // Convert to Gbps for display
   const in_bps_gbps = in_bps / 1e9
