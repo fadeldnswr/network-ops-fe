@@ -1,6 +1,5 @@
 'use client'
 
-
 import { ActivitySquare } from 'lucide-react'
 import { RSLOverviewTable, type RSLOverviewRow } from '@/components/dashboard/rsl-overview-table'
 import { RSLOutputResponse, RSLOutputRow, RSLStatus } from '@/lib/types/olt-rsl'
@@ -33,6 +32,8 @@ export default function RSL() {
       const response = await apiGet<RSLOutputResponse>(
         `/olt-table/?query_status=${encodeURIComponent(status)}`
       )
+
+      // Ensure response data is an array and map to table rows
       const rows = Array.isArray(response.data) ? response.data : []
 
       // Map each value to rows
@@ -70,6 +71,7 @@ export default function RSL() {
     }, 5 * 60 * 1000)
   }, [query])
 
+  // Return JSX for RSL overview page
   return (
     <div className="space-y-6">
       <section className="space-y-4">
@@ -107,7 +109,6 @@ export default function RSL() {
             )
           })}
         </div>
-
         {error ? (
           <div className="rounded-md border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-400">
             {error}
