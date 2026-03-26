@@ -3,14 +3,16 @@
 import { ActivitySquare } from 'lucide-react'
 import { RSLOverviewTable, type RSLOverviewRow } from '@/components/dashboard/rsl-overview-table'
 import { RSLOutputResponse, RSLOutputRow, RSLStatus } from '@/lib/types/olt-rsl'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { apiGet } from '@/lib/api/client'
+import { Search } from 'lucide-react'
 
 const statusOption: RSLStatus[] = ["GOOD", "WARN", "CRIT"]
 
 export default function RSL() {
   const [query, setQuery]= useState<RSLStatus>("WARN")
   const [rslData, setRslData] = useState<RSLOutputRow[]>([])
+  const [search, setSearch] = useState<string>("")
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -22,7 +24,7 @@ export default function RSL() {
     return 'GOOD'
   }
 
-  // Define function to fetch RSL overview data from API
+  // Define function to fetch RSL overview data from API 
   const fetchRSLOverview = async (status: RSLStatus) => {
     try {
       setError(null)
@@ -62,6 +64,21 @@ export default function RSL() {
     }
   }
 
+  // Define function to filter RSL data based on search query
+  const filteredData = useMemo(() => {
+    const keyword = search.trim().toLowerCase()
+
+    if (!keyword) return rslData
+
+    return rslData.filter((item) => {
+      return (
+        item.olt_name.toLowerCase().includes(keyword) ||
+        item.pon_port.toLowerCase().includes(keyword) ||
+        item.status.toLowerCase().includes(keyword)
+      )
+    })
+  }, [search, rslData])
+
   // Fetch RSL overview data on component mount
   useEffect(() => {
     fetchRSLOverview(query)
@@ -69,6 +86,8 @@ export default function RSL() {
     const id = setInterval(() => {
       fetchRSLOverview(query)
     }, 5 * 60 * 1000)
+
+    return () => clearInterval(id)
   }, [query])
 
   // Return JSX for RSL overview page
@@ -109,14 +128,25 @@ export default function RSL() {
             )
           })}
         </div>
+        {/* Search Bar */}
+        <div className='relative w-full md:w-80'>
+          <Search className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
+          <input 
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder='Search'
+          className='w-full rounded-md border border-border bg-card py-2 pl-10 pr-4 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary'
+          />
+        </div>
         {error ? (
           <div className="rounded-md border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-400">
             {error}
           </div>
         ) : (
           <RSLOverviewTable
-            data={rslData}
-            emptyMessage={loading ? 'Loading RSL overview data...' : 'No RSL overview data available.'}
+            data={filteredData}
+            emptyMessage={loading ? 'Loading RSL overview data...' : search.trim() ? "No matching RSL data found." : "No RSL data available."}
             pageSize={10}
           />
         )}
