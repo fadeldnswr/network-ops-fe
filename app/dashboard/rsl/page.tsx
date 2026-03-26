@@ -7,9 +7,11 @@ import { useEffect, useMemo, useState } from 'react'
 import { apiGet } from '@/lib/api/client'
 import { Search } from 'lucide-react'
 
+// Define status options for RSL table
 const statusOption: RSLStatus[] = ["GOOD", "WARN", "CRIT"]
 
 export default function RSL() {
+  // Define state variables for query, RSL data, search input, loading state, and error message
   const [query, setQuery]= useState<RSLStatus>("WARN")
   const [rslData, setRslData] = useState<RSLOutputRow[]>([])
   const [search, setSearch] = useState<string>("")
@@ -66,10 +68,13 @@ export default function RSL() {
 
   // Define function to filter RSL data based on search query
   const filteredData = useMemo(() => {
+    // Trim and convert search query to lowercase for case insensitive matching
     const keyword = search.trim().toLowerCase()
-
+    
+    // If search query is empty, return all RSL data
     if (!keyword) return rslData
 
+    // Return filtered RSL data where any of the specified fields include the search keyword
     return rslData.filter((item) => {
       return (
         item.olt_name.toLowerCase().includes(keyword) ||
@@ -81,12 +86,15 @@ export default function RSL() {
 
   // Fetch RSL overview data on component mount
   useEffect(() => {
+    // Initial fetch of RSL overview data based on default query status
     fetchRSLOverview(query)
 
+    // Set up interval to refresh data every 5 minutes
     const id = setInterval(() => {
       fetchRSLOverview(query)
     }, 5 * 60 * 1000)
 
+    // Clear interval on component unmount
     return () => clearInterval(id)
   }, [query])
 
@@ -121,13 +129,13 @@ export default function RSL() {
                       : 'bg-emerald-500/15 text-emerald-400'
                     : 'text-muted-foreground hover:bg-secondary/40 hover:text-foreground',
                 ].join(' ')}
-                onClick={() => setQuery(status)}
-              >
+                onClick={() => setQuery(status)}>
                 {status}
               </button>
             )
           })}
         </div>
+        
         {/* Search Bar */}
         <div className='relative w-full md:w-80'>
           <Search className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
@@ -144,6 +152,8 @@ export default function RSL() {
             {error}
           </div>
         ) : (
+
+          // Render RSL overview table with filtered data
           <RSLOverviewTable
             data={filteredData}
             emptyMessage={loading ? 'Loading RSL overview data...' : search.trim() ? "No matching RSL data found." : "No RSL data available."}
