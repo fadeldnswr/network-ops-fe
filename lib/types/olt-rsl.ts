@@ -9,6 +9,9 @@ export type RSLOutputItem = {
   rsl_percent: number
   status: string
   last_updated: string
+  customer_count: number
+  fdt_names: string
+  fat_names: string
 }
 
 // Define RSL output response from API
@@ -24,4 +27,7 @@ export type RSLOutputRow = {
   rsl_percent: number
   status: RSLStatus
   last_updated: string
+  customer_count: number
+  fdt_names: string
+  fat_names: string
 }
