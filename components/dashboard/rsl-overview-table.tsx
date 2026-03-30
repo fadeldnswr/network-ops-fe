@@ -12,6 +12,9 @@ export type RSLOverviewRow = {
     pon_port: string
     status: RSLStatus
     last_updated: string
+    customer_count: number
+    fdt_names: string
+    fat_names: string
 }
 
 // Define props for RSLOverviewTable
@@ -79,6 +82,15 @@ export function RSLOverviewTable({
                 PON Port
               </th>
               <th className="px-4 py-3 text-left text-sm font-semibold text-foreground border-b border-border">
+                FDT Names
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-foreground border-b border-border">
+                FAT Names
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-foreground border-b border-border">
+                Total Customers
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-foreground border-b border-border">
                 Status
               </th>
               <th className="px-4 py-3 text-left text-sm font-semibold text-foreground border-b border-border">
@@ -91,7 +103,7 @@ export function RSLOverviewTable({
             {data.length === 0 ? (
               <tr>
                 <td
-                  colSpan={4}
+                  colSpan={6}
                   className="px-4 py-10 text-center text-sm text-muted-foreground"
                 >
                   {emptyMessage}
@@ -104,10 +116,27 @@ export function RSLOverviewTable({
                   className="border-b border-border/70 transition-colors hover:bg-secondary/20"
                 >
                   <td className="px-4 py-4 text-sm text-foreground font-medium whitespace-nowrap">
-                    {row.olt_name}
+                    {row.olt_name}  
                   </td>
                   <td className="px-4 py-4 text-sm text-foreground whitespace-nowrap">
                     {row.pon_port}
+                  </td>
+                  <td className="px-4 py-4 text-sm text-foreground whitespace-nowrap">
+                    <div className="flex flex-col gap-1">
+                      {row.fdt_names.split(",").map((item, index) => (
+                        <span key={index} className="inline-block rounded bg-blue-500/10 text-blue-400 px-2 py-0.5 text-xs w-fit">{item.trim()}</span>
+                      ))}
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 text-sm text-foreground whitespace-nowrap">
+                    <div className="flex flex-col gap-1">
+                      {row.fat_names.split(",").map((item, index) => (
+                        <span key={index} className="inline-block rounded bg-blue-500/10 text-blue-400 px-2 py-0.5 text-xs w-fit">{item.trim()}</span>
+                      ))}
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 text-sm text-foreground whitespace-nowrap">
+                    {row.customer_count}
                   </td>
                   <td className="px-4 py-4 text-sm text-foreground whitespace-nowrap">
                     <RSLStatusBadge status={row.status} />
