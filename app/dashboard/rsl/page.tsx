@@ -17,6 +17,7 @@ export default function RSL() {
   const [search, setSearch] = useState<string>("")
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
+  const [sortData, setSortData] = useState<"default" | "desc" | "asc">("default")
 
   // Define function to normalize RSL status
   const normalizeRSLStatus = (value: string): RSLStatus => {
@@ -55,6 +56,9 @@ export default function RSL() {
           minute: '2-digit',
           second: '2-digit',
         }),
+        customer_count: item.customer_count,
+        fdt_names: item.fdt_names,
+        fat_names: item.fat_names,
       }))
       setRslData(mapped)
     } catch (e: any) {
@@ -79,10 +83,25 @@ export default function RSL() {
       return (
         item.olt_name.toLowerCase().includes(keyword) ||
         item.pon_port.toLowerCase().includes(keyword) ||
-        item.status.toLowerCase().includes(keyword)
+        item.status.toLowerCase().includes(keyword) ||
+        item.fdt_names.toLowerCase().includes(keyword) ||
+        item.fat_names.toLowerCase().includes(keyword)
       )
     })
   }, [search, rslData])
+
+  // Define function to sort data
+  const sortedData = useMemo(() => {
+    const rows = [...filteredData]
+    
+    // Define sorting logic based on sortData state
+    if(sortData === "desc") {
+      return rows.sort((a, b) => b.customer_count - a.customer_count)
+    } else if(sortData === "asc") {
+      return rows.sort((a, b) => a.customer_count - b.customer_count)
+    }
+    return rows
+  },[filteredData, sortData])
 
   // Fetch RSL overview data on component mount
   useEffect(() => {
@@ -112,51 +131,85 @@ export default function RSL() {
           </p>
         </div>
 
-        {/* Query Button */}
-        <div className='flex flex-wrap gap-2'>
-          {statusOption.map((status) => {
-            const isActive = query === status
-            return (
-              <button
-                key={status}
-                className={[
-                  'rounded-md px-4 py-2 text-sm font-medium transition',
-                  isActive
-                    ? status === 'CRIT'
-                      ? 'bg-red-500/15 text-red-400'
-                      : status === 'WARN'
-                      ? 'bg-amber-500/15 text-amber-400'
-                      : 'bg-emerald-500/15 text-emerald-400'
-                    : 'text-muted-foreground hover:bg-secondary/40 hover:text-foreground',
-                ].join(' ')}
-                onClick={() => setQuery(status)}>
-                {status}
-              </button>
-            )
-          })}
+        {/* Aligned Controls */}
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          
+          {/* Status Buttons */}
+          <div className="flex flex-wrap gap-2">
+            {statusOption.map((status) => {
+              const isActive = query === status
+              return (
+                <button
+                  key={status}
+                  className={[
+                    'rounded-md px-4 py-2 text-sm font-medium transition',
+                    isActive
+                      ? status === 'CRIT'
+                        ? 'bg-red-500/15 text-red-400'
+                        : status === 'WARN'
+                        ? 'bg-amber-500/15 text-amber-400'
+                        : 'bg-emerald-500/15 text-emerald-400'
+                      : 'text-muted-foreground hover:bg-secondary/40 hover:text-foreground',
+                  ].join(' ')}
+                  onClick={() => setQuery(status)}
+                >
+                  {status}
+                </button>
+              )
+            })}
+          </div>
+
+          {/* RIGHT: Sort + Search */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end w-full lg:w-auto">
+            
+            {/* Sort Button */}
+            <button
+              onClick={() =>
+                setSortData((prev) =>
+                  prev === 'default'
+                    ? 'desc'
+                    : prev === 'desc'
+                    ? 'asc'
+                    : 'default'
+                )
+              }
+              className="rounded-md border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition hover:bg-secondary/40 whitespace-nowrap"
+            >
+              {sortData === 'default' && 'Sort Customers'}
+              {sortData === 'desc' && 'Customer ↓'}
+              {sortData === 'asc' && 'Customer ↑'}
+            </button>
+
+            {/* Search Bar */}
+            <div className="relative w-full sm:w-72">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search OLT, port, status..."
+                className="w-full rounded-md border border-border bg-card py-2 pl-10 pr-4 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary"
+              />
+            </div>
+          </div>
         </div>
-        
-        {/* Search Bar */}
-        <div className='relative w-full md:w-80'>
-          <Search className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
-          <input 
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder='Search'
-          className='w-full rounded-md border border-border bg-card py-2 pl-10 pr-4 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary'
-          />
-        </div>
+
+        {/* Error Message */}
         {error ? (
           <div className="rounded-md border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-400">
             {error}
           </div>
-        ) : (
-
-          // Render RSL overview table with filtered data
+        ) : ( 
+          // RSL Overview Table
           <RSLOverviewTable
-            data={filteredData}
-            emptyMessage={loading ? 'Loading RSL overview data...' : search.trim() ? "No matching RSL data found." : "No RSL data available."}
+            data={sortedData}
+            emptyMessage={
+              loading
+                ? 'Loading RSL overview data...'
+                : search.trim()
+                ? 'No matching RSL data found.'
+                : 'No RSL data available.'
+            }
             pageSize={10}
           />
         )}
