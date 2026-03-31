@@ -17,7 +17,7 @@ export default function DashboardLayout({
           collapsed ? 'lg:ml-20' : 'lg:ml-64'
         }`}
       >
-        <DashboardHeader title="Network Operations Center Dashboard" subtitle="Monitor and observe large scale network infrastructure" />
+        <DashboardHeader title="Network Operations Center FTTH Dashboard" subtitle="Monitor and observe large scale FTTH network infrastructure" />
         <main className="flex-1 p-6 overflow-auto">
           {children}
         </main>
