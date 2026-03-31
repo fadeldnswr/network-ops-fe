@@ -27,10 +27,16 @@ const navItems = [
     icon: Router,
   },
   {
-    title: 'RSL Overview',
+    title: 'RSL Access Overview',
     href: '/dashboard/rsl',
     icon: Users2,
   },
+  {
+    title: "ONT Checker",
+    href: "/dashboard/ont-checker",
+    icon: Radio,
+  }
+
 ]
 
 // Sidebar component with responsive design and collapsible functionality
