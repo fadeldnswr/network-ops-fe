@@ -1,8 +1,8 @@
 'use client'
 
-import { Cable, CircleAlert, Link, MapPin, Network, WifiOff, Activity, HardDrive, Server, User } from 'lucide-react'
+import { Cable, CircleAlert, Link, MapPin, Network, WifiOff, Activity, HardDrive, Server, User, Search } from 'lucide-react'
 import type { CityOverviewResponse } from '@/lib/types/city'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { apiGet } from '@/lib/api/client'
 import { DeviceOverviewResponse } from '@/lib/types/network-overview'
 import { DeviceCard, DeviceCardProps } from '@/components/dashboard/device-card'
@@ -61,6 +61,7 @@ export default function CitiesPage() {
   const [data, setData] = useState<DeviceOverviewResponse | null>(null)
   const [linkConnection, setLinkConnection] = useState<LinkConnection | null>(null)
   const [alertTable, setAlertTable] = useState<AlertTableRow[]>([])
+  const [searchData, setSearchData] = useState<string>("");
 
   // Define state for loading and error handling
   const [loading, setLoading] = useState(true)
@@ -111,6 +112,7 @@ export default function CitiesPage() {
     } catch (e: any) {
       console.error("Fetch table error", e)
       setError(e?.message ?? "Failed to load alert data from server")
+      setAlertTable([])
     } finally {
       setLoading(false)
     }
@@ -154,6 +156,24 @@ export default function CitiesPage() {
       setLoading(false)
     }
   }
+
+  // Define function to search alert table based on user input
+  const filteredTable = useMemo(() => {
+    // Trime and convert search query to lowercase for case-insensitive matching
+    const keyword = searchData.trim().toLowerCase()
+
+    // If search query is empty, return original alert table data
+    if(!keyword) return alertTable
+
+    // Return filtered alert table data based on device name, site, or alert type matching the search query
+    return alertTable.filter((item) => {
+      return (
+        item.device.toLowerCase().includes(keyword) ||
+        item.site.toLowerCase().includes(keyword) ||
+        item.alert_type.toLowerCase().includes(keyword)
+      )
+    })
+  }, [searchData, alertTable])
 
   // Fetch city overview data on component mount
   useEffect(() => {
@@ -338,12 +358,23 @@ export default function CitiesPage() {
             View detailed alert information across all sites
           </p>
         </div>
-
+        
+        {/* Search Input */}
+        <div className='relative w-full sm:w-72'>
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"/>
+          <input
+            type="text"
+            value={searchData}
+            onChange={(e) => setSearchData(e.target.value)}
+            placeholder='Search'
+            className='w-full rounded-md border border-border bg-card py-2 pl-10 pr-4 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary'
+          />
+        </div>
         <AlertTable
           title="Active Alerts"
           description="Current alarm and incident list across monitored devices"
           columns={alertColumns}
-          data={alertTable}
+          data={filteredTable}
           emptyMessage="No active alerts at the moment."
           pageSize={5}
         />
