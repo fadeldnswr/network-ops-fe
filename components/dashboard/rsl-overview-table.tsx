@@ -13,6 +13,7 @@ export type RSLOverviewRow = {
     status: RSLStatus
     last_updated: string
     customer_count: number
+    bad_rsl_cust: number
     fdt_names: string
     fat_names: string
 }
@@ -91,6 +92,9 @@ export function RSLOverviewTable({
                 Total Customers
               </th>
               <th className="px-4 py-3 text-left text-sm font-semibold text-foreground border-b border-border">
+                Bad RSL Customers
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-foreground border-b border-border">
                 Status
               </th>
               <th className="px-4 py-3 text-left text-sm font-semibold text-foreground border-b border-border">
@@ -137,6 +141,11 @@ export function RSLOverviewTable({
                   </td>
                   <td className="px-4 py-4 text-sm text-foreground whitespace-nowrap">
                     {row.customer_count}
+                  </td>
+                  <td className="px-4 py-4 text-sm whitespace-nowrap">
+                    <p className="bg-red-500/10 text-red-400 w-fit">
+                      {row.bad_rsl_cust}
+                    </p>
                   </td>
                   <td className="px-4 py-4 text-sm text-foreground whitespace-nowrap">
                     <RSLStatusBadge status={row.status} />
