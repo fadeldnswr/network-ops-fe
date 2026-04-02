@@ -10,6 +10,7 @@ export type RSLOutputItem = {
   status: string
   last_updated: string
   customer_count: number
+  bad_rsl_cust: number
   fdt_names: string
   fat_names: string
 }
@@ -28,6 +29,7 @@ export type RSLOutputRow = {
   status: RSLStatus
   last_updated: string
   customer_count: number
+  bad_rsl_cust: number
   fdt_names: string
   fat_names: string
 }
