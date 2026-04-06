@@ -11,6 +11,7 @@ export type RSLOutputItem = {
   last_updated: string
   customer_count: number
   bad_rsl_cust: number
+  bad_homepass_list?: string
   fdt_names: string
   fat_names: string
 }
@@ -32,4 +33,5 @@ export type RSLOutputRow = {
   bad_rsl_cust: number
   fdt_names: string
   fat_names: string
+  bad_homepass_list?: string
 }
