@@ -122,6 +122,9 @@ export default function NetworkMonitoringPage() {
             <option value="jmb">Jambi</option>
             <option value="wsb">Wonosobo</option>
             <option value="smgn">Simalungun</option>
+            <option value="lht">Lahat</option>
+            <option value="sit">Situbondo</option>
+            <option value="bgl">Bengkulu</option>
           </select>
         </div>
       </div>
