@@ -4,7 +4,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   Radio, Users2, HardDrive, Network,
-  Menu, X, ChevronRight, ChevronLeft, Router 
+  Menu, X, ChevronRight, ChevronLeft, Router, 
+  Form
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import React, { useState } from 'react'
@@ -35,8 +36,12 @@ const navItems = [
     title: "ONT Checker",
     href: "/dashboard/ont-checker",
     icon: Radio,
+  },
+  {
+    title: "NMS Provisioning",
+    href: "/dashboard/nms-provisioning",
+    icon: Form,
   }
-
 ]
 
 // Sidebar component with responsive design and collapsible functionality
