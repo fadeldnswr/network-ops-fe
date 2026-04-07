@@ -57,6 +57,8 @@ export default function RSL() {
           second: '2-digit',
         }),
         customer_count: item.customer_count,
+        bad_rsl_cust: item.bad_rsl_cust,
+        bad_homepass_list: item.bad_homepass_list,
         fdt_names: item.fdt_names,
         fat_names: item.fat_names,
       }))
@@ -187,7 +189,7 @@ export default function RSL() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search OLT, port, status..."
+                placeholder="Search"
                 className="w-full rounded-md border border-border bg-card py-2 pl-10 pr-4 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary"
               />
             </div>
